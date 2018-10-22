@@ -1,4 +1,4 @@
-package bugger
+package main
 
 import (
 	"github.com/bramvdbogaerde/go-scp/auth"
