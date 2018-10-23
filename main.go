@@ -7,7 +7,7 @@ import (
 	"os"
 	"golang.org/x/crypto/ssh"
 	"github.com/chenhg5/ecsDeploy/deploy"
-	"utils/sms"
+	"github.com/chenhg5/go-utils/sms"
 	"time"
 	"github.com/chenhg5/go-utils/ini"
 	"flag"
