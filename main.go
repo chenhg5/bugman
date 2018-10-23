@@ -5,11 +5,11 @@ import (
 	"github.com/bramvdbogaerde/go-scp"
 	"fmt"
 	"os"
-	"golang.org/x/crypto/ssh"
 	"github.com/chenhg5/ecsDeploy/deploy"
 	"github.com/chenhg5/go-utils/sms"
 	"time"
 	"github.com/chenhg5/go-utils/ini"
+	"golang.org/x/crypto/ssh"
 	"flag"
 )
 
@@ -44,6 +44,8 @@ func main() {
 		// 阿里云获取最新的host
 		ips := project.GetIps()
 
+		fmt.Println("ips", ips)
+
 		// 从 host 拉取最新的error.log
 		for i := 0; i < len(ips); i++ {
 			go func(host string) {
@@ -62,6 +64,7 @@ func main() {
 
 func CheckSize(file string, host string) bool {
 	fileInfo, _ := os.Stat(file)
+	fmt.Println("checkSize", fileInfo.Size(), "host", host)
 	if size, ok := Sizes[host]; ok {
 		if fileInfo.Size() != size {
 			Sizes[host] = fileInfo.Size()
