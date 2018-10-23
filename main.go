@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"os"
 	"golang.org/x/crypto/ssh"
-	"ecsDeploy/deploy"
+	"github.com/chenhg5/ecsDeploy/deploy"
 	"utils/sms"
 	"time"
-	"utils/ini"
+	"github.com/chenhg5/go-utils/ini"
 	"flag"
 )
 
