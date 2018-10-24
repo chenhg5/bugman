@@ -13,7 +13,7 @@ import (
 	"flag"
 )
 
-var Sizes map[string]int64
+var Sizes = make(map[string]int64, 0)
 
 func main() {
 
