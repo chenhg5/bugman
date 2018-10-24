@@ -32,7 +32,7 @@ func main() {
 	for i := 0; i < len(ips); i++ {
 		// 复制
 		localFile := "/root/logcenter/" + ips[i] + "/" + config["local_file"]
-		Copy(config["ssh_user"], config["ssh_key"], ips[i], config["remote_file"], localFile, config["local_file_permission"])
+		Copy(config["ssh_user"], config["ssh_key"], ips[i] + ":22", config["remote_file"], localFile, config["local_file_permission"])
 		fileInfo, _ := os.Stat(localFile)
 		Sizes[ips[i]] = fileInfo.Size()
 	}
