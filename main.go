@@ -11,6 +11,7 @@ import (
 	"github.com/chenhg5/go-utils/ini"
 	"golang.org/x/crypto/ssh"
 	"flag"
+	"path"
 )
 
 var Sizes = make(map[string]int64, 0)
@@ -32,14 +33,20 @@ func main() {
 	for i := 0; i < len(ips); i++ {
 		// 复制
 		localFile := "/root/logcenter/" + ips[i] + "/" + config["local_file"]
-		Copy(config["ssh_user"], config["ssh_key"], ips[i] + ":22", config["remote_file"], localFile, config["local_file_permission"])
-		fileInfo, _ := os.Stat(localFile)
+		err := Copy(config["ssh_user"], config["ssh_key"], ips[i] + ":22", config["remote_file"], localFile, config["local_file_permission"])
+		if err != nil {
+			panic(err)
+		}
+		fileInfo, err := os.Stat(localFile)
+		if err != nil {
+			panic(err)
+		}
 		Sizes[ips[i]] = fileInfo.Size()
 	}
 
 	for true {
 		// 每隔五分钟进行一次
-		time.Sleep(time.Minute * 8)
+		time.Sleep(time.Minute * 5)
 
 		// 阿里云获取最新的host
 		ips := project.GetIps()
@@ -51,11 +58,13 @@ func main() {
 			go func(host string) {
 				// 复制
 				localFile := "/root/logcenter/" + host + "/" + config["local_file"]
-				Copy("root", config["ssh_key"], host, config["remote_file"], localFile, config["local_file_permission"])
+				Copy("root", config["ssh_key"], host + ":22", config["remote_file"], localFile, config["local_file_permission"])
 				// 检查大小
 				if !CheckSize(localFile, host) {
 					// 如果有增加就发通知
 					Notify(smser, host, config["phone"])
+				} else {
+					fmt.Println("ok, no send")
 				}
 			}(ips[i])
 		}
@@ -78,6 +87,7 @@ func CheckSize(file string, host string) bool {
 }
 
 func Notify(smser *sms.AlidayuSmSType, host string, phone string) {
+	fmt.Println("send it", phone, "host", host)
 	smser.SendAlidayuSMS(phone, host)
 }
 
@@ -93,12 +103,15 @@ func Copy(user, key, host, remoteFile, localFile, permission string) error {
 		return err
 	}
 
-	// Open a file
-	f, _ := os.Open(localFile)
+	os.MkdirAll(path.Dir(localFile), 0666)
+	f, _ := os.Create(localFile)
+	if err != nil {
+		panic(err)
+	}
 	defer client.Close()
 	defer f.Close()
 
-	client.CopyFile(f, remoteFile, permission) // 0655
+	client.CopyFile(f, remoteFile, permission)
 
 	return nil
 }
